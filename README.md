@@ -1,62 +1,119 @@
-# Wanderlust Web Project Installation Guide
+# Tripio
 
-This guide will walk you through the installation process for the Wanderlust web project. Follow the steps below to set up the project locally on your machine.
+A full-stack MVC travel listing application built with Node.js, Express, and MongoDB. Users can browse property listings, create their own, leave star ratings and reviews, and manage their bookings through a session-based authentication system.
 
-## Prerequisites
+**Live demo:** [tripio-1.onrender.com](https://tripio-1.onrender.com)
+**Repo:** [github.com/quynx-dot/Tripio](https://github.com/quynx-dot/Tripio)
 
-Before you begin, make sure you have the following installed on your system:
+---
 
-- Node.js (version 18 recommended)
-- MongoDB
-- Nodemon (installed globally)
+## Features
 
-## Installation Steps
+- **Listings CRUD** — create, view, edit, and delete property listings with image uploads
+- **Image storage on AWS S3** — listing images are uploaded directly to an S3 bucket via `multer-s3`
+- **Reviews & ratings** — authenticated users can leave star ratings (via Starability) and text reviews on any listing
+- **Authentication & authorization** — signup/login/logout with `passport-local`, session persistence via `connect-mongo`, and ownership checks so only a listing's owner can edit/delete it, and only a review's author can delete it
+- **Server-side validation** — request bodies validated with Joi schemas before hitting the database
+- **Flash messaging** — success/error feedback on actions via `connect-flash`
+- **Responsive UI** — Bootstrap 5 + custom CSS, EJS templating with `ejs-mate` for layout inheritance
 
-1. Clone the Wanderlust repository from GitHub:
+## Tech Stack
 
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js |
+| Framework | Express.js |
+| Templating | EJS + ejs-mate |
+| Database | MongoDB (Atlas) via Mongoose |
+| File Storage | AWS S3 (`@aws-sdk/client-s3`, `multer-s3`) |
+| Auth | Passport.js (`passport-local`, `passport-local-mongoose`) |
+| Sessions | `express-session` + `connect-mongo` |
+| Validation | Joi |
+| Styling | Bootstrap 5, custom CSS |
+| Deployment | Render |
+
+## Project Structure
+
+```
+Tripio/
+├── controllers/      # Route handler logic (listings, reviews, users)
+├── init/              # DB seed script and sample data
+├── models/            # Mongoose schemas (Listing, Review, User)
+├── public/            # Static assets (CSS, JS)
+├── routes/            # Express routers
+├── utils/             # Error handling helpers
+├── views/             # EJS templates
+├── app.js             # App entry point
+├── middleware.js       # Auth/ownership/validation middleware
+├── schema.js           # Joi validation schemas
+└── s3Config.js          # AWS S3 + multer storage config
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js v18+
+- A MongoDB Atlas cluster (or local MongoDB instance)
+- An AWS account with an S3 bucket and an IAM user with S3 access
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/quynx-dot/Tripio.git
+   cd Tripio
    ```
-   git clone https://github.com/quynx-dot/Wanderlust-Major-Project.git
-   ```
 
-2. Set up the database:
-   - Create a `.env` file in the root directory of the project.
-   - Add the following line to the `.env` file:
+2. Install dependencies:
 
-     ```
-     ATLASDB_URL=mongodb://127.0.0.1:27017/wanderlust
-     ```
-
-3. Set up Cloudinary:
-   - Go to [Cloudinary](https://cloudinary.com/) and sign up for a free account.
-   - Once logged in, obtain your Cloudinary `CLOUD_NAME`, `CLOUD_API_KEY`, and `CLOUD_API_SECRET`.
-   - Add these values to the `.env` file:
-
-     ```
-     CLOUD_NAME=your_cloud_name
-     CLOUD_API_KEY=your_api_key
-     CLOUD_API_SECRET=your_api_secret
-     ```
-
-4. Set the secret for your Cloudinary storage:
-   - Add a `SECRET` key to your `.env` file and set it to a secure value:
-
-     ```
-     SECRET=your_cloudinary_secret
-     ```
-
-5. Install project dependencies using npm:
-
-   ```
+   ```bash
    npm install
    ```
 
-6. Run the application using Nodemon:
+3. Create a `.env` file in the project root with the following variables:
 
+   ```env
+   ATLASDB_URL=your_mongodb_connection_string
+   SECRET=your_session_secret
+
+   AWS_ACCESS_KEY_ID=your_aws_access_key
+   AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+   AWS_REGION=ap-south-1
+   AWS_BUCKET_NAME=your_s3_bucket_name
    ```
+
+4. Start the app:
+
+   ```bash
+   npm start
+   ```
+
+   Or, for auto-restart on file changes during development (requires `nodemon` installed globally):
+
+   ```bash
    nodemon app.js
    ```
 
-7. Access the project:
-   - Once the server is running, you can access the project at [http://localhost:8080](http://localhost:8080).
+5. Visit [http://localhost:8080](http://localhost:8080) (or the port Render assigns in production).
 
-That's it! You have successfully installed and set up the Wanderlust web project on your local machine. If you encounter any issues during the installation process, feel free to reach out for assistance. Happy traveling! 
+## Environment Variables
+
+| Variable | Description |
+|---|---|
+| `ATLASDB_URL` | MongoDB connection string (Atlas or local) |
+| `SECRET` | Secret used to sign session cookies and the Mongo session store |
+| `AWS_ACCESS_KEY_ID` | IAM user access key for S3 |
+| `AWS_SECRET_ACCESS_KEY` | IAM user secret key for S3 |
+| `AWS_REGION` | AWS region the S3 bucket lives in |
+| `AWS_BUCKET_NAME` | Name of the S3 bucket used for image uploads |
+| `PORT` | (Set automatically by Render in production) |
+
+## Deployment
+
+The app is deployed on [Render](https://render.com). It binds to `process.env.PORT` at runtime (required for Render's dynamic port assignment) and reads all secrets from Render's Environment tab rather than a committed `.env` file.
+
+## Author
+
+Janhavi Ghanghav — [GitHub](https://github.com/quynx-dot)
